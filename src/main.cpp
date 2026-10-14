@@ -3710,6 +3710,22 @@ static void close3D() {
     );
 }
 
+// World-space glide velocity for the WASD inertia (units/second). Lives
+// across frames so releasing the keys coasts down instead of cutting dead.
+static Vec3 s_moveVel{};
+
+static void toggleFlight() {
+    g_playerFlying = !g_playerFlying;
+
+    if (!g_playerFlying)
+        s_moveVel.y = 0.f;
+
+    notify(
+        g_playerFlying ? "[hypr3d] flight on" : "[hypr3d] flight off",
+        CHyprColor{0.2f, 0.8f, 0.4f, 1.0f}
+    );
+}
+
 static float updateTransition() {
     const auto now = std::chrono::steady_clock::now();
 
@@ -3736,10 +3752,6 @@ static float updateTransition() {
 }
 
 // --- frame ------------------------------------------------------------------
-
-// World-space glide velocity for the WASD inertia (units/second). Lives
-// across frames so releasing the keys coasts down instead of cutting dead.
-static Vec3 s_moveVel{};
 
 // Walk bob (view-only): sine phase in radians + eased amplitude. The body
 // pose stays physical -- the offset rides on the camera each frame and is
@@ -6903,6 +6915,11 @@ static int luaClose(lua_State*) {
     return 0;
 }
 
+static int luaToggleFlight(lua_State*) {
+    toggleFlight();
+    return 0;
+}
+
 static SDispatchResult dispatchToggle(std::string) {
     toggle3D();
     return {};
@@ -6915,6 +6932,11 @@ static SDispatchResult dispatchOpen(std::string) {
 
 static SDispatchResult dispatchClose(std::string) {
     close3D();
+    return {};
+}
+
+static SDispatchResult dispatchToggleFlight(std::string) {
+    toggleFlight();
     return {};
 }
 
@@ -6964,6 +6986,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     if (!HyprlandAPI::addDispatcherV2(PHANDLE, "hypr3d:close", dispatchClose))
         throw std::runtime_error("[hypr3d] failed to register close dispatcher");
 
+    if (!HyprlandAPI::addDispatcherV2(PHANDLE, "hypr3d:toggle_flight", dispatchToggleFlight))
+        throw std::runtime_error("[hypr3d] failed to register toggle_flight dispatcher");
+
     if (!HyprlandAPI::addLuaFunction(PHANDLE, "hypr3d", "toggle", luaToggle))
         throw std::runtime_error("[hypr3d] failed to register Lua toggle");
 
@@ -6978,6 +7003,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
     if (!HyprlandAPI::addLuaFunction(PHANDLE, "hypr3d", "on_state", luaOnState))
         throw std::runtime_error("[hypr3d] failed to register Lua on_state");
+
+    if (!HyprlandAPI::addLuaFunction(PHANDLE, "hypr3d", "toggle_flight", luaToggleFlight))
+        throw std::runtime_error("[hypr3d] failed to register Lua toggle_flight");
 
     if (!HyprlandAPI::addLuaFunction(PHANDLE, "hypr3d", "config", luaConfig))
         throw std::runtime_error("[hypr3d] failed to register Lua config");
