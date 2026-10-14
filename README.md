@@ -163,13 +163,14 @@ end
 
 ## Lua API
 
-| Function                           | Description                                       |
-| ------------------------------------| ---------------------------------------------------|
-| `hypr3d.toggle()`                  | open the room if closed, close it if open         |
-| `hypr3d.open()` / `hypr3d.close()` | explicit open / close                             |
-| `hypr3d.active()`                  | `true` while the 3D room is open                  |
-| `hypr3d.on_state(fn)`              | call `fn(open)` whenever the room opens or closes |
-| `hypr3d.config({params})`          | see [Config parameters](#config-parameters)       |
+| Function                           | Description                                        |
+| ---------------------------------- | -------------------------------------------------- |
+| `hypr3d.toggle()`                  | open the room if closed, close it if open          |
+| `hypr3d.open()` / `hypr3d.close()` | explicit open / close                              |
+| `hypr3d.active()`                  | `true` while the 3D room is open                   |
+| `hypr3d.on_state(fn)`              | call `fn(open)` whenever the room opens or closes  |
+| `hypr3d.toggle_flight()`           | disables flight when enabled, enables it otherwise |
+| `hypr3d.config({params})`          | see [Config parameters](#config-parameters)        |
 
 ## <a name="config-parameters"></a> Config parameters
 
